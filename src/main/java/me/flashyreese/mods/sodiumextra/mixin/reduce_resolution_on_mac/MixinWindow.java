@@ -22,28 +22,4 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Licensed under Apache-2.0
  */
 @Mixin(Window.class)
-public class MixinWindow {
-    @Shadow
-    private int framebufferWidth;
-
-    @Shadow
-    private int framebufferHeight;
-
-    @WrapOperation(at = @At(value = "INVOKE", target = "Lorg/lwjgl/glfw/GLFW;glfwWindowHint(II)V", ordinal = 0), method = "<init>", remap = false)
-    private void onDefaultWindowHints(int hint, int value, Operation<Void> original) {
-        if (MinecraftClient.IS_SYSTEM_MAC && SodiumExtraClientMod.options().extraSettings.reduceResolutionOnMac) {
-            original.call(GLFW.GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW.GLFW_FALSE);
-        }
-
-        original.call(hint, value);
-    }
-
-    @Inject(at = @At(value = "RETURN"), method = "updateFramebufferSize")
-    private void afterUpdateFrameBufferSize(CallbackInfo ci) {
-        // prevents mis-scaled startup screen
-        if (MinecraftClient.IS_SYSTEM_MAC && SodiumExtraClientMod.options().extraSettings.reduceResolutionOnMac) {
-            framebufferWidth /= 2;
-            framebufferHeight /= 2;
-        }
-    }
-}
+public class MixinWindow {}
